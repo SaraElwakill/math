@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Land ✨</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/nunito/700.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    body { font-family: 'Nunito', sans-serif; background: #FFF7EF; color: #5B3247; margin: 0; padding: 2rem; background-image: radial-gradient(rgba(255,157,190,.14) 1.6px, transparent 1.6px); background-size: 26px 26px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    
+    /* Layout */
+    .top-section { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    @media (max-width: 768px) { .top-section { grid-template-columns: 1fr; } }
+    
+    /* Cards */
+    .panel { background: #fff; padding: 1.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(224,86,140,.1); border: 2px solid #FFD3E2; }
+    h1, h2 { color: #7C3D62; margin: 0 0 10px 0; }
+    
+    /* Login & Leaderboard */
+    input { padding: 10px; border-radius: 10px; border: 2px solid #FFD3E2; margin: 5px 0; font-family: inherit; outline: none; width: 100%; box-sizing: border-box;}
+    .leaderboard-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #FFD3E2; font-weight: bold;}
+    .leaderboard-row:last-child { border: none; }
+    .rank-1 { color: #E4B04A; font-size: 1.1rem;}
+    
+    /* Lesson Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+    .card { background: #fff; padding: 1.5rem; border-radius: 20px; border: 2px solid #FFD3E2; box-shadow: 0 6px 16px rgba(224,86,140,.1); transition: 0.3s; }
+    .card:hover { transform: translateY(-5px); border-color: #FF9DBE; }
+    .emoji { font-size: 2.5rem; background: #FFEAF2; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 15px; margin-bottom: 10px; }
+    
+    button { background: linear-gradient(135deg, #E0568C, #FF9DBE); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-family: inherit; font-size: 1rem; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;}
+    button:hover { transform: scale(1.02); }
+    .btn-small { background: #FFEAF2; color: #E0568C; width: auto; padding: 5px 15px; font-size: 0.8rem; }
+    
+    #mascot { position: fixed; bottom: 20px; right: 20px; background: white; padding: 15px; border-radius: 20px; border: 2px solid #FFD3E2; box-shadow: 0 10px 30px rgba(224,86,140,.2); display: flex; align-items: center; gap: 15px; max-width: 250px; z-index: 100;}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-section">
+    <!-- Welcome & Login Panel -->
+    <div class="panel">
+      <h1>Study Land ✨</h1>
+      
+      <div id="login-zone">
+        <p>Enter your nickname to join the adventure!</p>
+        <input type="text" id="studentNickname" placeholder="Your Fun Nickname (e.g. ScienceNinja)">
+        <input type="password" id="studentPin" placeholder="Class PIN">
+        <button onclick="saveLogin()">Let's Go! 🚀</button>
+      </div>
+
+      <div id="welcome-zone" style="display: none;">
+        <h2 id="greeting-text">Hi, Ninja!</h2>
+        <p>Ready to earn some points today?</p>
+        <button class="btn-small" onclick="logout()">Not you? Switch student</button>
+      </div>
+    </div>
+
+    <!-- Leaderboard Panel -->
+    <div class="panel" style="background: #FFF0F4;">
+      <h2>🏆 Top Stars</h2>
+      <div id="leaderboard-container">
+        <p style="font-size: 0.9rem;">Loading scores...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lessons -->
+  <div class="grid" id="lesson-container">
+    <p style="text-align: center; width: 100%;">Loading your curriculum... 🎀</p>
+  </div>
+</div>
+
+<div id="mascot">
+  <div style="font-size: 2rem;">⭐</div>
+  <div id="mascot-text" style="font-size: 0.9rem; font-weight: bold;">Hi! I'm Stella. Let's get you on that leaderboard!</div>
+</div>
+
+<script>
+  // PASTE YOUR GOOGLE WEB APP URL HERE:
+  const SCRIPT_URL = "YOUR_WEB_APP_URL_HERE";
+
+  // Check if student is already logged in on this device
+  function checkLogin() {
+    const savedName = localStorage.getItem("studyNickname");
+    if (savedName) {
+      document.getElementById('login-zone').style.display = "none";
+      document.getElementById('welcome-zone').style.display = "block";
+      document.getElementById('greeting-text').innerText = "Hi, " + savedName + "! 🌟";
+    }
+  }
+
+  function saveLogin() {
+    const name = document.getElementById('studentNickname').value.trim();
+    const pin = document.getElementById('studentPin').value.trim();
+    if (name && pin) {
+      localStorage.setItem("studyNickname", name);
+      localStorage.setItem("studyPin", pin);
+      checkLogin();
+      document.getElementById('mascot-text').innerText = "Welcome back, " + name + "!";
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("studyNickname");
+    localStorage.removeItem("studyPin");
+    document.getElementById('login-zone').style.display = "block";
+    document.getElementById('welcome-zone').style.display = "none";
+    document.getElementById('studentNickname').value = "";
+    document.getElementById('studentPin').value = "";
+  }
+
+  // Fetch Lessons and Leaderboard
+  function loadData() {
+    fetch(SCRIPT_URL)
+      .then(response => response.json())
+      .then(data => {
+        // Build Leaderboard
+        const lbContainer = document.getElementById('leaderboard-container');
+        lbContainer.innerHTML = "";
+        if (data.leaderboard.length === 0) lbContainer.innerHTML = "<p>No points yet. Be the first!</p>";
+        
+        data.leaderboard.forEach((student, index) => {
+          let rankClass = index === 0 ? 'rank-1' : '';
+          let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '⭐';
+          lbContainer.innerHTML += `
+            <div class="leaderboard-row ${rankClass}">
+              <span>${medal} ${student.nickname}</span>
+              <span>${student.points} pts</span>
+            </div>
+          `;
+        });
+
+        // Build Lessons
+        const lessonContainer = document.getElementById('lesson-container');
+        lessonContainer.innerHTML = ""; 
+        data.lessons.forEach(row => {
+          if (!row[0]) return;
+          lessonContainer.innerHTML += `
+            <div class="card">
+              <div class="emoji">${row[2] || "📚"}</div>
+              <div style="color: #E0568C; font-size: 0.8rem; font-weight: bold;">${row[0]} - ${row[1]}</div>
+              <h3 style="margin: 5px 0; color: #7C3D62;">${row[3]}</h3>
+              <p style="font-size: 0.9rem; color: #7d5468;">${row[4]}</p>
+              <button onclick="markComplete('${row[1]}', '${row[0]}', this)">Earn 300 Pts ✅</button>
+            </div>
+          `;
+        });
+      });
+  }
+
+  function markComplete(lessonId, subject, btnElement) {
+    const nickname = localStorage.getItem("studyNickname");
+    const pin = localStorage.getItem("studyPin");
+
+    if (!nickname || !pin) {
+      document.getElementById('mascot-text').innerText = "Oops! You need to log in first! ⭐";
+      return;
+    }
+
+    btnElement.innerText = "Saving... ☁️";
+    
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ nickname: nickname, pin: pin, lessonId: lessonId, subject: subject })
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.error) {
+        btnElement.innerText = "Try Again!";
+        document.getElementById('mascot-text').innerText = result.error;
+      } else {
+        btnElement.innerText = "Completed! 🎉";
+        btnElement.style.background = "#5FB98A";
+        btnElement.disabled = true;
+        document.getElementById('mascot-text').innerText = "300 points for " + nickname + "! 🎉";
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        
+        // Refresh the leaderboard quietly in the background
+        setTimeout(loadData, 2000); 
+      }
+    });
+  }
+
+  // Initialize
+  checkLogin();
+  loadData();
+</script>
+</body>
+</html>
